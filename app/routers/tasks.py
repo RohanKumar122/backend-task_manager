@@ -5,7 +5,8 @@ from bson import ObjectId
 from datetime import datetime
 from typing import Optional
 from app.auth import get_current_user
-
+from pymongo import ASCENDING,DESCENDING
+from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
@@ -14,29 +15,55 @@ def validate_object_id(id: str):
         raise HTTPException(status_code=400, detail="Invalid task ID")
     return ObjectId(id)
 
+
+
+
 @router.get("/tasks")
 async def get_tasks(current_user: str = Depends(get_current_user)):
     try:
-        tasks = list(tasks_collection.find({"user": current_user})) 
+        tasks = list(tasks_collection.find({"user": current_user}))
+        
+        # Convert UTC to IST for the 'created_at' field (Add 5 hours and 30 minutes)
+        for task in tasks:
+            task["_id"] = str(task["_id"])  # Convert ObjectId to string
+            if "created_at" in task and isinstance(task["created_at"], datetime):
+                # Convert UTC to IST
+                task["created_at"] = task["created_at"] + timedelta(hours=5, minutes=30)
+        
         return tasks
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Error fetching tasks")
+        raise HTTPException(status_code=500, detail=f"Error fetching tasks: {str(e)}")
 
 
 @router.post("/", response_model=TaskResponse)
 def create_task(task: TaskCreate, token: str = Depends(get_current_user)):
     task_dict = task.dict()
-    task_dict["created_at"] = datetime.utcnow()
+    print(task_dict)
+
+    # Get the current UTC time
+    utc_time = datetime.utcnow()
+
+    # Add 5 hours and 30 minutes to convert UTC to IST
+    india_time = utc_time + timedelta(hours=5, minutes=30)
+
+    task_dict["created_at"] = india_time  # Store IST time
+
+
     result = db.tasks.insert_one(task_dict)
     task_dict["_id"] = str(result.inserted_id)
+    
     return TaskResponse(id=str(result.inserted_id), **task_dict)
 
 @router.get("/", response_model=list[TaskResponse])
 def get_tasks(status: Optional[str] = None, token: str = Depends(get_current_user)):
     query = {"status": status} if status else {}
-    tasks = list(db.tasks.find(query))
+    
+    # Fetch tasks sorted by created_at in descending order
+    tasks = list(db.tasks.find(query).sort("due_date", ASCENDING))
+    
     for task in tasks:
-        task["id"] = str(task.pop("_id"))
+        task["id"] = str(task.pop("_id"))  # Convert ObjectId to string
+    
     return tasks
 
 @router.get("/order-by-due-date", response_model=list[TaskResponse])
