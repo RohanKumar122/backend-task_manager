@@ -20,6 +20,5 @@ class TaskUpdate(BaseModel):
 class TaskResponse(TaskCreate):
     id: str
     created_at: datetime
-
     class Config:
         from_attributes = True  # Changed from orm_mode to from_attributes

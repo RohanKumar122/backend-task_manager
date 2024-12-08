@@ -12,16 +12,13 @@ class User(BaseModel):
     class Config:
         from_attributes = True
 
-
 class UserInDB(User):
     id: str 
-
 
 class TaskStatus(str, Enum):
     todo = "To Do"
     in_progress = "In Progress"
     done = "Done"
-
 
 class TaskBase(BaseModel):
     title: str
@@ -29,20 +26,16 @@ class TaskBase(BaseModel):
     status: TaskStatus
     due_date: datetime
 
-
 class TaskCreate(TaskBase):
     pass
 
-
 class Task(TaskBase):
     id: str = Field(..., alias="_id")  
-
     @validator('id', pre=True)
     def convert_objectid_to_str(cls, v):
         if isinstance(v, ObjectId):
             return str(v)
         return v
-
     class Config:
         from_attributes = True  
 

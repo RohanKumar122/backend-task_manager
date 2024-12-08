@@ -28,8 +28,7 @@ fake_users_db = {
     }
 }
 
-def verify_password(plain_password: str, password: str) -> bool:
-    
+def verify_password(plain_password: str, password: str) -> bool:   
     return plain_password == password
 
 def get_user(db: dict, username: str) -> UserInDB | None:
