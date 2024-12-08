@@ -16,7 +16,6 @@ class TaskUpdate(BaseModel):
     status: Optional[str] = None  
     due_date: Optional[datetime] = None  # Changed from str to datetime
 
-
 class TaskResponse(TaskCreate):
     id: str
     created_at: datetime

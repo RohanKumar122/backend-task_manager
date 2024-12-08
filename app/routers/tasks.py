@@ -79,3 +79,34 @@ def delete_task(task_id: str, token: str = Depends(get_current_user)):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Task not found")
     return {"message": "Task deleted"}
+
+@router.put("/{task_id}", response_model=TaskResponse)
+def update_task(task_id: str, task: TaskUpdate, token: str = Depends(get_current_user)):
+    # Validate task ID
+    task_id = validate_object_id(task_id)
+
+    # Extract update data, excluding unset fields
+    update_data = {k: v for k, v in task.dict(exclude_unset=True).items()}
+
+    # If no data is provided to update, raise an error
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No data provided to update")
+
+    # Perform the update
+    result = tasks_collection.find_one_and_update(
+        {"_id": task_id},  # Match task by its ObjectId
+        {"$set": update_data},  # Update only specified fields
+        return_document=True  # Return the updated document
+    )
+
+    # If no matching task is found, raise an error
+    if not result:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    # Convert the MongoDB ObjectId to string and adjust the date to IST
+    result["id"] = str(result.pop("_id"))
+    if "created_at" in result and isinstance(result["created_at"], datetime):
+        result["created_at"] += timedelta(hours=5, minutes=30)
+
+    # Return the updated task
+    return TaskResponse(**result)
