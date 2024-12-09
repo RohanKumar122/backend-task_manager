@@ -1,0 +1,51 @@
+{
+	"info": {
+		"_postman_id": "ef98dac6-3210-4157-899b-fda28fc6d5c2",
+		"name": "Task-manager-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31660480",
+		"_collection_link": "https://illusioniq.postman.co/workspace/IllusionIQ-Workspace~63d278b1-5730-4bf1-a2d0-673968fef26d/collection/31660480-ef98dac6-3210-4157-899b-fda28fc6d5c2?action=share&source=collection_link&creator=31660480"
+	},
+	"item": [
+		{
+			"name": "GET TOKEN",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "GET all tasks",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "create task",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "update task",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "delete task",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
